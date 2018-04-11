@@ -1,0 +1,39 @@
+tr{
+	border: 1px solid transparent !important;
+	height:auto;
+}
+
+td{
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 20%;
+    height:auto;
+    border: 1px solid transparent !important;
+}
+
+.material, .clear-control, .reprint-control, .finish-control, .cancel-control{
+	display: inline-block;
+	height:70px;
+	/*height:auto;*/
+	font-size: 24px; 
+	line-height: 1.75;
+}
+
+.material {
+	background-color: #7aabf9 !important;
+	border-color: #7aabf9 !important;
+}
+
+.home-nav-control, .value-entry-nav-control, .print-nav-control {
+	background-color: #2378ff !important;
+	border-color: #2378ff !important;
+}
+
+.table-buttons{
+	position:fixed;
+	bottom:0; 
+	height:auto; 
+	width:100%;
+}

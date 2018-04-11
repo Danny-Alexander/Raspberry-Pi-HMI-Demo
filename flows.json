@@ -1,0 +1,666 @@
+[
+    {
+        "id": "2e9edfd3.f1f6d",
+        "type": "tab",
+        "label": "FSM test"
+    },
+    {
+        "id": "720b5083.ea25c",
+        "type": "tab",
+        "label": "Test-Simulation"
+    },
+    {
+        "id": "8d8467bc.e3be48",
+        "type": "tab",
+        "label": "Startup"
+    },
+    {
+        "id": "39701d2a.bb7572",
+        "type": "websocket-listener",
+        "z": "",
+        "path": "/ws",
+        "wholemsg": "false"
+    },
+    {
+        "id": "7ab356e7.df0c78",
+        "type": "FSM",
+        "z": "2e9edfd3.f1f6d",
+        "name": "Display FSM",
+        "topic": "state",
+        "initstate": "HOME",
+        "inittran": "TR_HOME",
+        "entry": true,
+        "exit": true,
+        "tran": true,
+        "rules": [
+            {
+                "n": "home-enter",
+                "c": "ValueEntry_NavButton_Click",
+                "s": "HOME",
+                "d": "ENTER",
+                "t": "true"
+            },
+            {
+                "n": "print-enter",
+                "c": "ValueEntry_NavButton_Click",
+                "s": "PRINT",
+                "d": "ENTER",
+                "t": "true"
+            },
+            {
+                "n": "home-print",
+                "c": "Print_NavButton_Click",
+                "s": "HOME",
+                "d": "PRINT",
+                "t": "true"
+            },
+            {
+                "n": "enter-print",
+                "c": "Print_NavButton_Click",
+                "s": "ENTER",
+                "d": "PRINT",
+                "t": "true"
+            },
+            {
+                "n": "print-home",
+                "c": "Home_NavButton_Click",
+                "s": "PRINT",
+                "d": "HOME",
+                "t": "true"
+            },
+            {
+                "n": "enter-home",
+                "c": "Home_NavButton_Click",
+                "s": "ENTER",
+                "d": "HOME",
+                "t": "true"
+            }
+        ],
+        "x": 390,
+        "y": 240,
+        "wires": [
+            [
+                "c22202ef.ce5bd",
+                "a8ab8f17.3df6c",
+                "298449e8.f3eb46",
+                "2be3f689.0e0e3a"
+            ]
+        ]
+    },
+    {
+        "id": "6c95f0ad.1ebb7",
+        "type": "debug",
+        "z": "2e9edfd3.f1f6d",
+        "name": "current state",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 910,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "4e21efa1.55774",
+        "type": "function",
+        "z": "2e9edfd3.f1f6d",
+        "name": "get state",
+        "func": "itemValue = 0.1; //TODO: move to global var\n\nif(msg.payload.split(\"_\")[1] == \"entry\") {\n    state = msg.payload.split(\"_\")[0];\n    prev = global.get('prevState');\n    \n    global.set(\"state\", state);\n    \n    msg.payload = {\n        'state'     : state,\n        'prev'      : prev\n    };\n    \n    return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 720,
+        "y": 320,
+        "wires": [
+            [
+                "6c95f0ad.1ebb7",
+                "a3e20278.8af22"
+            ]
+        ]
+    },
+    {
+        "id": "c22202ef.ce5bd",
+        "type": "function",
+        "z": "2e9edfd3.f1f6d",
+        "name": "get prevState",
+        "func": "if(msg.payload.split(\"_\")[1] == \"exit\") {\n    prevState = msg.payload.split(\"_\")[0];\n    global.set(\"prevState\", prevState);\n    msg.payload = {'prevState' : prevState};\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 730,
+        "y": 240,
+        "wires": [
+            [
+                "70a87db8.872204"
+            ]
+        ]
+    },
+    {
+        "id": "88db48df.3bb238",
+        "type": "http in",
+        "z": "2e9edfd3.f1f6d",
+        "name": "",
+        "url": "/test",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 80,
+        "wires": [
+            [
+                "131472ec.1c930d"
+            ]
+        ]
+    },
+    {
+        "id": "131472ec.1c930d",
+        "type": "function",
+        "z": "2e9edfd3.f1f6d",
+        "name": "get state from globals",
+        "func": "msg.payload = global.get(\"state\");\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 80,
+        "wires": [
+            [
+                "123f3f55.5ac791"
+            ]
+        ]
+    },
+    {
+        "id": "220405c1.cd691a",
+        "type": "http response",
+        "z": "2e9edfd3.f1f6d",
+        "name": "",
+        "x": 630,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "123f3f55.5ac791",
+        "type": "template",
+        "z": "2e9edfd3.f1f6d",
+        "name": "Screen Display",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<html>\n    <head>\n        <meta charset=\"utf-8\">\n        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->\n    \n        <!-- Latest compiled and minified CSS -->\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/bootstrap.min.css\">\n        \n        <!-- Optional theme -->\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/bootstrap_cyborg.min.css\">\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/font-awesome.min.css\">\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/sticky-footer-navbar.css\">\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/raspberry-pi-hmi-demo.css\">\n        <link rel=\"stylesheet\" href=\"/jQuery.NumPad/jquery.numpad.css\">\n        \n        <title>Raspberry Pi HMI Demo</title>\n        <script src=\"/libs/jquery.js\"></script>\n        <script type=\"text/javascript\" src=\"/jQuery.NumPad/jquery.numpad.js\"></script>\n        \n    </head>\n    <body onload=\"wsConn();\" onunload=\"ws.disconnect;\">\n        <nav class=\"navbar navbar-inverse\" style=\"background-color: #6a6a6a\">\n            <div class=\"container-fluid\">\n                <div class=\"navbar-header\">\n                    <a class=\"navbar-brand\">\n                        <h4>Raspberry Pi HMI Demo</h4>\n                    </a>\n                </div>\n                <div id=\"navbar\" class=\"collapse navbar-collapse navbar-left\">\n                      <ul class=\"nav navbar-nav\">\n                            <li class=\"active\"><a href=\"/test\"><h4 id=\"state\" style=\"visibility:hidden\">STATE: HOME</h4></a></li>\n                      </ul>\n                </div><!--/.nav-collapse -->\n\n            </div>\n        </nav>\n        \n        <!--Home Screen-->\n        <div class=\"row home-screen\">\n            <div class=\"container col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4\">\n                <h1 class=\"text-center\">Home</h1>\n            </div>\n        </div>\n        \n        <!--Entry Screen-->\n        <div class=\"row entry-screen\">\n            <div class=\"container col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4\">\n                <h1 class=\"text-center\">Value Entry</h1>\n            </div>\n            <div class=\"container col-md-4 col-sm-5 col-md-offset-2 col-sm-offset-1\">\n                <h3 class=\"text-right\">Value:</h3>\n            </div>\n            <div class=\"container col-md-4 col-sm-5 \">\n                <h3 class=\"text-left\" id=\"dispValue\">40</h3>\n            </div>\n        </div>\n        \n        <!--Print Screen-->\n        <div class=\"row print-screen\">\n            <div class=\"container col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4\">\n                <h1 class=\"text-center\">Print</h1>\n            </div>\n        </div>\n        \n        \n        <!-- Control section -->\n\t\t<table class=\"table-bordered table-buttons\">\n\t\t\t<!-- Controls -->\n\t\t\t<tr>\n\t\t\t\t<td> </td>\n\t\t\t\t<td> </td>\n\t\t\t\t<td> </td>\n\t\t\t\t<td> </td>\n\t\t\t\t<td> </td>\n\t\t\t</tr>\n\t\t<!-- Navigation Controls -->\n\t\t\t<tr>\n\t\t\t\t<td> </td>\n\t\t\t\t<td> <a onclick='sendJSON(\"Home_NavButton_Click\");' class=\"btn btn-warning btn-block btn-lg home-nav-control\" role=\"button\">Home</a> </td>\n\t\t\t\t<td> <a onclick='sendJSON(\"ValueEntry_NavButton_Click\");' class=\"btn btn-warning btn-block btn-lg value-entry-nav-control\" role=\"button\">Value Entry</a> </td>\n\t\t\t\t<td> <a onclick='sendJSON(\"Print_NavButton_Click\");' class=\"btn btn-warning btn-block btn-lg print-nav-control\" role=\"button\">Print</a> </td>\n\t\t\t\t<td> </td>\n\t\t\t</tr>\t\n\t\t</table>\n        \n        \n        <script type=\"text/javascript\">\n            \n            var server = window.location.hostname;\n            //var server = \"localhost\";\n            var topics = {};\n            var wsUriC = \"ws://\"+server+\":8000/ws\";\n            var ws;\n            \n            var state = '';\n            var prevState = '';\n            \n            showScreen(\"home-screen\");\n            \n            $(function() {\n                $.fn.numpad.defaults.cellTpl = '<td style=\"padding: 0px 5px 10px 5px\"></td>';\n                $.fn.numpad.defaults.hidePlusMinusButton = true;\n                $.fn.numpad.defaults.hideDecimalButton = true;\n                $.fn.numpad.defaults.textDone = \"ENTER\";\n                $.fn.numpad.defaults.textClear = \"CLEAR\";\n                $.fn.numpad.defaults.textCancel = \"CANCEL\";\n                $.fn.numpad.defaults.buttonNumberTpl = '<button type=\"button\" class=\"btn btn-default  btn-lg\" style=\"width: 100%; font-size: 26px\"></button>';\n                $.fn.numpad.defaults.buttonFunctionTpl = '<button type=\"button\" class=\"btn btn-default btn-lg\" style=\"width: 100%; font-size: 26px\"></button>';\n                $.fn.numpad.defaults.displayCellTpl = '<td colspan=\"3\" style=\"padding: 0px 5px 10px 5px\"></td>';\n                $.fn.numpad.defaults.displayTpl = '<input type=\"number\" class=\"input-lg\" style=\"color:black; width:100%; font-size: 30px; padding: 10px 0px 0px 0px\"/>';\n                $.fn.numpad.defaults.backgroundTpl = '<div></div>';\n                $.fn.numpad.defaults.onKeypadOpen = function(){\n                    $(this).find('.done').addClass('btn-warning');\n                    $('.material').hide();\n                    $('.finish-control').hide();\n                    $('.cancel-control').hide();\n                };\n                // Copy the input value to another element\n                $.fn.numpad.defaults.onKeypadClose = function(){\n                    $('.material').show();\n                    $('.finish-control').show();\n                    $('.cancel-control').show();\n                    \n                    sendData = {\n                        'keyEvent'  : 'enter',\n                        'state'     : state,\n                        'name'      : $('#current').text(),\n                        'count'     : $('#dispValue').text()\n                    }\n                    ws.send(JSON.stringify(sendData));\n                    \n                }\n                                \n                $(document).ready(function() {\n                    $('#dispValue').numpad();\n                })\n            });\n            \n            function wsConn() {\n                ws = new WebSocket(wsUriC);\n                \n                \n                ws.onclose = function() {\n                    $(\"#status\").html(\"Couldn't connect!\");\n                    setTimeout(wsConn,1000);\n                };\n                \n                ws.onmessage = function(msg) {\n                    var inData = JSON.parse(msg.data);\n                    state = inData.state;\n                    prevState = inData.prev;\n                    \n                    if(state == 'HOME'){\n                        showScreen(\"home-screen\");\n                    }\n                    else if(state == 'ENTER'){\n                        showScreen(\"entry-screen\");\n                        $('#dispValue').numpad('open');\n                    //    setTimeout(function(){\n                    //        $('#dispValue').numpad('open');\n                    //    }, 150);\n                    }\n                    else if(state == 'PRINT'){\n                        showScreen(\"print-screen\");\n                    }\n                    \n                    $(\"#state\").html(\"State: \"+inData.state);\n                    $(\"#prev\").html(inData.prev);\n                    $(\"#current\").html(inData.current+\":\");\n                    $(\"#next\").html(inData.next);\n                }\n            };\n            \n            function showScreen(screenName){\n                hideAllDisplayElements()\n                $(\".\"+screenName).show();\n                showNavigationControls()\n            }\n            \n            \n            function sendJSON(m){\n                if(ws) {\n                    var jsonMsg = {\n                    \t'keyEvent' : m\n                    }\n                    ws.send(JSON.stringify(jsonMsg));\n                };\n            }\n            function sendJSONandKeypad(m){\n                if(ws) {\n                    var jsonMsg = {\n                    \t'keyEvent' : m\n                    }\n                    ws.send(JSON.stringify(jsonMsg));\n                };\n                setTimeout(function(){\n                    $('#dispValue').numpad('open');\n                }, 150);\n            }\n            \n            // Hides all page text, buttons etc \n            //   Called in preparation to display only those aplicable for current screen/state\n            function hideAllDisplayElements(hideNavigationControls = false){\n                $(\".home-screen\").hide();\n                $(\".entry-screen\").hide();\n                $(\".print-screen\").hide();\n                if (hideNavigationControls) {\n                    $(\".home-nav-control\").hide();\n                    $(\".value-entry-nav-control\").hide();\n                    $(\".print-nav-control\").hide();\n                }\n            }\n            function showNavigationControls(){\n                    $(\".home-nav-control\").show();\n                    $(\".value-entry-nav-control\").show();\n                    $(\".print-nav-control\").show();\n            }\n            \n            $(document).keydown(function(e) {\n                if(e.key == 'r') {\n                    sendJSON('rfid');\n                }\n            });\n        \n        </script>\n    </body>\n</html>",
+        "x": 480,
+        "y": 80,
+        "wires": [
+            [
+                "220405c1.cd691a"
+            ]
+        ]
+    },
+    {
+        "id": "980e0ff.e2363f",
+        "type": "websocket in",
+        "z": "2e9edfd3.f1f6d",
+        "name": "",
+        "server": "39701d2a.bb7572",
+        "client": "",
+        "x": 90,
+        "y": 160,
+        "wires": [
+            [
+                "154f75a6.6c042a"
+            ]
+        ]
+    },
+    {
+        "id": "a3e20278.8af22",
+        "type": "websocket out",
+        "z": "2e9edfd3.f1f6d",
+        "name": "",
+        "server": "39701d2a.bb7572",
+        "client": "",
+        "x": 900,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "2442fd8e.ded202",
+        "type": "debug",
+        "z": "2e9edfd3.f1f6d",
+        "name": "websocket data received",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 430,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "154f75a6.6c042a",
+        "type": "json",
+        "z": "2e9edfd3.f1f6d",
+        "name": "",
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "2442fd8e.ded202",
+                "cede7ad6.760968"
+            ]
+        ]
+    },
+    {
+        "id": "7380dfb9.034ea",
+        "type": "inject",
+        "z": "8d8467bc.e3be48",
+        "name": "Run on startup",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 160,
+        "y": 180,
+        "wires": [
+            [
+                "3305e05e.88ee1",
+                "70705c8d.efebd4"
+            ]
+        ]
+    },
+    {
+        "id": "5b2157ad.846b58",
+        "type": "exec",
+        "z": "8d8467bc.e3be48",
+        "command": "startx  /usr/bin/chromium-browser --incognito --kiosk --noerrdiaglogs --disable-session-crash-bubble --disable-infobars --window-size=1920,1080 http://localhost:8000/test -- -nocursor",
+        "addpay": false,
+        "append": "",
+        "useSpawn": true,
+        "timer": "",
+        "name": "Chrome: Collector Home",
+        "x": 790,
+        "y": 220,
+        "wires": [
+            [
+                "439879c2.f94e38"
+            ],
+            [
+                "439879c2.f94e38"
+            ],
+            [
+                "439879c2.f94e38"
+            ]
+        ]
+    },
+    {
+        "id": "3305e05e.88ee1",
+        "type": "delay",
+        "z": "8d8467bc.e3be48",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 460,
+        "y": 180,
+        "wires": [
+            [
+                "5b2157ad.846b58",
+                "ee5b4cdc.016"
+            ]
+        ]
+    },
+    {
+        "id": "70705c8d.efebd4",
+        "type": "exec",
+        "z": "8d8467bc.e3be48",
+        "command": "./wifi-nosleep.py",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Disable wifi power saving",
+        "x": 490,
+        "y": 260,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "ee5b4cdc.016",
+        "type": "delay",
+        "z": "8d8467bc.e3be48",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 740,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "17398b1b.f9f865",
+        "type": "exec",
+        "z": "8d8467bc.e3be48",
+        "command": "xset -display :0 s off; xset -display :0 s noblank; xset  -display :0 -dpms",
+        "addpay": false,
+        "append": "",
+        "useSpawn": false,
+        "timer": "",
+        "name": "Disable screensaver",
+        "x": 1060,
+        "y": 160,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "439879c2.f94e38",
+        "type": "debug",
+        "z": "8d8467bc.e3be48",
+        "name": "Chrome output debug",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 1060,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "a8ab8f17.3df6c",
+        "type": "function",
+        "z": "2e9edfd3.f1f6d",
+        "name": "get transition",
+        "func": "\nif(!/^[a-zA-Z0-9]+_(entry|exit|INIT)$/.test(msg.payload)) {\n    transition = msg.payload;\n\n    //global.set('Transition', transition);\n    \n    msg.payload = {'transition' : transition };\n    return msg;\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 730,
+        "y": 280,
+        "wires": [
+            [
+                "515a719d.a8e08"
+            ]
+        ]
+    },
+    {
+        "id": "298449e8.f3eb46",
+        "type": "delay",
+        "z": "2e9edfd3.f1f6d",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "0.1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 550,
+        "y": 320,
+        "wires": [
+            [
+                "4e21efa1.55774"
+            ]
+        ]
+    },
+    {
+        "id": "70a87db8.872204",
+        "type": "debug",
+        "z": "2e9edfd3.f1f6d",
+        "name": "prev state name",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 920,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "515a719d.a8e08",
+        "type": "debug",
+        "z": "2e9edfd3.f1f6d",
+        "name": "transition name",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 920,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "cede7ad6.760968",
+        "type": "function",
+        "z": "2e9edfd3.f1f6d",
+        "name": "KeyEvent to FSM Condition",
+        "func": "var keyEventStrings = {\n    Home_NavButton_Click: true, \n    ValueEntry_NavButton_Click: true, \n    Print_NavButton_Click: true \n    };\n    \nif (msg.payload.keyEvent) {\n    if (msg.payload.keyEvent in keyEventStrings) {\n        msg.topic = msg.payload.keyEvent;\n        msg.payload = true;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 160,
+        "y": 240,
+        "wires": [
+            [
+                "473cffc6.59834",
+                "7ab356e7.df0c78"
+            ]
+        ]
+    },
+    {
+        "id": "473cffc6.59834",
+        "type": "debug",
+        "z": "2e9edfd3.f1f6d",
+        "name": "FSM Condition",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 400,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "2be3f689.0e0e3a",
+        "type": "debug",
+        "z": "2e9edfd3.f1f6d",
+        "name": "FSM Messages",
+        "active": false,
+        "console": "false",
+        "complete": "payload",
+        "x": 620,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c9843e54.afc4f",
+        "type": "inject",
+        "z": "720b5083.ea25c",
+        "name": "Home nav button click",
+        "topic": "Home_NavButton_Click",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 140,
+        "y": 60,
+        "wires": [
+            [
+                "db75adbd.e2ff6"
+            ]
+        ]
+    },
+    {
+        "id": "c584759c.8320e8",
+        "type": "inject",
+        "z": "720b5083.ea25c",
+        "name": "Value Entry nav button click",
+        "topic": "ValueEntry_NavButton_Click",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "db75adbd.e2ff6"
+            ]
+        ]
+    },
+    {
+        "id": "52a99cb1.ac57c4",
+        "type": "inject",
+        "z": "720b5083.ea25c",
+        "name": "Print nav button click",
+        "topic": "Print_NavButton_Click",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "db75adbd.e2ff6"
+            ]
+        ]
+    },
+    {
+        "id": "baa1234e.dd151",
+        "type": "link in",
+        "z": "2e9edfd3.f1f6d",
+        "name": "FSM Test-Simulation",
+        "links": [
+            "db75adbd.e2ff6"
+        ],
+        "x": 255,
+        "y": 280,
+        "wires": [
+            [
+                "7ab356e7.df0c78"
+            ]
+        ]
+    },
+    {
+        "id": "db75adbd.e2ff6",
+        "type": "link out",
+        "z": "720b5083.ea25c",
+        "name": "FSM Test-Simulation",
+        "links": [
+            "baa1234e.dd151"
+        ],
+        "x": 395,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "539f6c5f.1e4234",
+        "type": "inject",
+        "z": "720b5083.ea25c",
+        "name": "get State",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 100,
+        "y": 280,
+        "wires": [
+            [
+                "cae4c5f8.77a1e8"
+            ]
+        ]
+    },
+    {
+        "id": "3417add1.b50432",
+        "type": "debug",
+        "z": "720b5083.ea25c",
+        "name": "current state",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 490,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "cae4c5f8.77a1e8",
+        "type": "function",
+        "z": "720b5083.ea25c",
+        "name": "get state from globals",
+        "func": "msg.payload = global.get(\"state\");\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 300,
+        "y": 280,
+        "wires": [
+            [
+                "3417add1.b50432"
+            ]
+        ]
+    },
+    {
+        "id": "f78d3863.3da358",
+        "type": "inject",
+        "z": "720b5083.ea25c",
+        "name": "Debug globals object",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 340,
+        "wires": [
+            [
+                "400590b9.9831d"
+            ]
+        ]
+    },
+    {
+        "id": "89f113c.8c1f1f",
+        "type": "debug",
+        "z": "720b5083.ea25c",
+        "name": "output global obj",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 480,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "400590b9.9831d",
+        "type": "function",
+        "z": "720b5083.ea25c",
+        "name": "get global obj",
+        "func": "// Set the payload to the object that stores global variables.\nmsg.payload = context.global\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 340,
+        "wires": [
+            [
+                "89f113c.8c1f1f"
+            ]
+        ]
+    }
+]
