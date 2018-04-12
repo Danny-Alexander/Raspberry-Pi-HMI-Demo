@@ -61,16 +61,6 @@ var settings = {
     userDir:".nodered/",
     flowFile: appRoot + '/flows.json',
     functionGlobalContext: redGlobals//,
-
- /*   adminAuth: {
-        type: "credentials",
-        users: [{
-            username: "admin",
-            password: "$2a$08$.cUokF5fQZWONht/54hOQ.ZmZR863Y/XuUcFe2pS3ZsHzhrSIQ9j6",
-            permissions: "*"
-        }]
-    }
-*/
 };
 
 RED.init(server, settings);
