@@ -23,16 +23,11 @@
   "author": "Nukon",
   "license": "ISC",
   "dependencies": {
-    "cypress": "^1.4.1",
     "dateformat": "^2.0.0",
     "express": "^4.14.1",
     "fs": "0.0.1-security",
     "node-red": "^0.16.2",
     "node-red-contrib-fsm": "0.0.6",
-    "node-red-contrib-keypress": "^1.0.1",
-    "node-red-contrib-opcua": "^0.2.20",
-    "node-red-node-geohash": "0.0.7",
-    "qr-encoder": "^1.1.1",
-    "string-pixel-width": "^1.1.1"
+    "node-red-contrib-keypress": "^1.0.1"
   }
 }
